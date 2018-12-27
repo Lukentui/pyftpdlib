@@ -265,7 +265,7 @@ class AbstractedFS(object):
         """List the content of a directory."""
         assert isinstance(path, unicode), path
         
-        if isinstance(self.exceptions, dict):
+        if isinstance(self.exceptions, list):
             files = os.listdir(path)
 
             for file in files:
