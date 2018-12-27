@@ -96,8 +96,8 @@ class AbstractedFS(object):
         """The user current working directory."""
         return self._cwd
 
-    @expcetions.setter
-    def expcetions(self, list_files):
+    @exceptions.setter
+    def exceptions(self, list_files):
         self.exceptions = list_files
     
     @root.setter
