@@ -97,7 +97,7 @@ class AbstractedFS(object):
         return self._cwd
 
     @expcetions.setter
-    def root(self, list_files):
+    def expcetions(self, list_files):
         self.exceptions = list_files
     
     @root.setter
