@@ -2294,6 +2294,10 @@ class FTPHandler(AsyncChat):
         # STOR: mode = 'w'
         # APPE: mode = 'a'
         # REST: mode = 'r+' (to permit seeking on file object)
+        if self.run_as_current_user(self.fs.is_hidden, file):
+            self.respond('550 Записать такой файл невозможно.')
+            return
+
         if 'a' in mode:
             cmd = 'APPE'
         else:
