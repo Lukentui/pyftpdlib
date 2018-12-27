@@ -68,8 +68,6 @@ class AbstractedFS(object):
     the methods below in order to send a customized error string
     to the client.
     """
-    
-    exceptions = []
 
     def __init__(self, root, cmd_channel):
         """
@@ -85,6 +83,7 @@ class AbstractedFS(object):
         self._cwd = u('/')
         self._root = root
         self.cmd_channel = cmd_channel
+        self._exceptions = []
 
     @property
     def root(self):
@@ -96,9 +95,14 @@ class AbstractedFS(object):
         """The user current working directory."""
         return self._cwd
 
+    @property
+    def exceptions(self):
+        """The user current working directory."""
+        return self._exceptions
+    
     @exceptions.setter
     def exceptions(self, list_files):
-        self.exceptions = list_files
+        self._exceptions = list_files
     
     @root.setter
     def root(self, path):
