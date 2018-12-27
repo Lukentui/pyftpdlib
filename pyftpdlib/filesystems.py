@@ -268,9 +268,11 @@ class AbstractedFS(object):
             for excluded_object in self.exceptions:
                 is_file = os.path.isfile(path)
 
+                print(str(os.path.join(self.cwd, excluded_object['name'])) + ':' + str(path))
+
                 # print(os.path.join(self.cwd, excluded_object['name']))
 
-                if (excluded_object['is_file'] == is_file) and (os.path.join(self.cwd, excluded_object['name'])  == path):
+                if (excluded_object['is_file'] == is_file) and (os.path.join(self.cwd, excluded_object['name']) == path):
                     return True #if file listed - return true
 
             return False
@@ -302,7 +304,6 @@ class AbstractedFS(object):
     def rmdir(self, path):
         """Remove the specified directory."""
         assert isinstance(path, unicode), path
-        print(path)
         if not self.is_hidden(path):
             os.rmdir(path)
 
