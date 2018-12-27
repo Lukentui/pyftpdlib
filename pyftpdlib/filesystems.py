@@ -273,7 +273,7 @@ class AbstractedFS(object):
 
 
 
-                if (excluded_object['is_file'] == is_file) and (os.path.join(self.cwd, excluded_object['name'][1:]) == path):
+                if (excluded_object['is_file'] == is_file) and (str(os.path.join(self.cwd, excluded_object['name'][1:])) == str(path)):
                     print('RETURNz!')
                     break
                     return True
