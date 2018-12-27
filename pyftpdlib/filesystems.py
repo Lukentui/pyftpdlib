@@ -82,8 +82,8 @@ class AbstractedFS(object):
         # are responsible to set _cwd attribute as necessary.
         self._cwd = u('/')
         self._root = root
-        self.cmd_channel = cmd_channel
         self._exceptions = []
+        self.cmd_channel = cmd_channel
 
     @property
     def root(self):
@@ -102,6 +102,7 @@ class AbstractedFS(object):
     
     @exceptions.setter
     def exceptions(self, list_files):
+        assert isinstance(list_files, list), list_files
         self._exceptions = list_files
     
     @root.setter
