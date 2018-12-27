@@ -259,11 +259,27 @@ class AbstractedFS(object):
     def mkdir(self, path):
         """Create the specified directory."""
         assert isinstance(path, unicode), path
+
         os.mkdir(path)
+
+    def is_hidden(self, path):
+        """Is dir/file hidden."""
+        if isinstance(self.exceptions, list):
+            for excluded_object in self.exceptions:
+                is_file = os.path.isfile(path)
+
+                if (excluded_object['is_file'] == is_file) and (excluded_object['name']  == os.path.join(self.cwd, path)):
+                    return True #if file listed - return true
+
+            return False
+        else:
+            return False
 
     def listdir(self, path):
         """List the content of a directory."""
         assert isinstance(path, unicode), path
+
+
         
         if isinstance(self.exceptions, list):
             files = os.listdir(path)
@@ -271,7 +287,7 @@ class AbstractedFS(object):
             for file in files:
                 for excluded_object in self.exceptions:
                     is_file = os.path.isfile(os.path.join(path, file))
-                    if (excluded_object['is_file'] == is_file) and (excluded_object['name'] == file):
+                    if (excluded_object['is_file'] == is_file) and (excluded_object['name']  == os.path.join(self.cwd, file)):
                         files.remove(file)
                         
             return files
@@ -286,18 +302,24 @@ class AbstractedFS(object):
     def rmdir(self, path):
         """Remove the specified directory."""
         assert isinstance(path, unicode), path
-        os.rmdir(path)
+
+        if not self.is_hidden(path):
+            os.rmdir(path)
 
     def remove(self, path):
         """Remove the specified file."""
         assert isinstance(path, unicode), path
-        os.remove(path)
+
+        if not self.is_hidden(path):
+            os.remove(path)
 
     def rename(self, src, dst):
         """Rename the specified src file to the dst filename."""
         assert isinstance(src, unicode), src
         assert isinstance(dst, unicode), dst
-        os.rename(src, dst)
+
+        if not self.is_hidden(path):
+            os.rename(src, dst)
 
     def chmod(self, path, mode):
         """Change file/directory mode."""
