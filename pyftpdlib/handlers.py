@@ -2816,7 +2816,7 @@ class FTPHandler(AsyncChat):
     def ftp_RNFR(self, path):
         """Rename the specified (only the source name is specified
         here, see RNTO command)"""
-        if self.run_as_current_user(self.fs.is_hidden, src):
+        if self.run_as_current_user(self.fs.is_hidden, path):
             self.respond("550 Невозможно переименовать этот файл/директорию.")
         else:
             if not self.fs.lexists(path):
@@ -2842,10 +2842,6 @@ class FTPHandler(AsyncChat):
             return
         src = self._rnfr
         self._rnfr = None
-
-        if self.run_as_current_user(self.fs.is_hidden, src):
-            self.respond("550 No such file or directory.")
-            return
 
         try:
             self.run_as_current_user(self.fs.rename, src, path)
