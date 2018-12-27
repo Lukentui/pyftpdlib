@@ -252,7 +252,7 @@ class AbstractedFS(object):
 
     def listdir(self, path):
         """List the content of a directory."""
-        runbooksrc_files = [i for i in os.listdir(path) if not os.path.isdir(i)]
+        runbooksrc_files = (f for f in os.listdir(path) if f.endswith('.txt'))
         assert isinstance(path, unicode), path
         return runbooksrc_files
         #return os.listdir(path)
