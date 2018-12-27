@@ -2124,6 +2124,10 @@ class FTPHandler(AsyncChat):
         # - If no argument, fall back on cwd as default.
         # - Some older FTP clients erroneously issue /bin/ls-like LIST
         #   formats in which case we fall back on cwd as default.
+        if self.run_as_current_user(self.fs.is_hidden, path):
+            self.respond('550 Невозможно прочесть эту директорию.')
+            return
+
         try:
             isdir = self.fs.isdir(path)
             if isdir:
@@ -2228,6 +2232,10 @@ class FTPHandler(AsyncChat):
         On success return the path just listed, else None.
         """
         # RFC-3659 requires 501 response code if path is not a directory
+        if self.run_as_current_user(self.fs.is_hidden, path):
+            self.respond('550 Невозможно получить содержимое этой директории.')
+            return
+
         if not self.fs.isdir(path):
             self.respond("501 No such directory.")
             return
@@ -2248,6 +2256,11 @@ class FTPHandler(AsyncChat):
         """Retrieve the specified file (transfer from the server to the
         client).  On success return the file path else None.
         """
+
+        if self.run_as_current_user(self.fs.is_hidden, file):
+            self.respond('550 Невозможно скачать этот файл.')
+            return
+
         rest_pos = self._restart_position
         self._restart_position = 0
         try:
@@ -2819,6 +2832,11 @@ class FTPHandler(AsyncChat):
         RNFR).
         On success return a (source_path, destination_path) tuple.
         """
+
+        if self.run_as_current_user(self.fs.is_hidden, path):
+            self.respond('550 Невозможно переименовать этот файл.')
+            return
+
         if not self._rnfr:
             self.respond("503 Bad sequence of commands: use RNFR first.")
             return
