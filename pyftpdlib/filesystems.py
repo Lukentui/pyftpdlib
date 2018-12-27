@@ -68,6 +68,8 @@ class AbstractedFS(object):
     the methods below in order to send a customized error string
     to the client.
     """
+    
+    exceptions = []
 
     def __init__(self, root, cmd_channel):
         """
@@ -252,10 +254,12 @@ class AbstractedFS(object):
 
     def listdir(self, path):
         """List the content of a directory."""
-        runbooksrc_files = (f for f in os.listdir(path) if f.endswith('.txt'))
         assert isinstance(path, unicode), path
-        return runbooksrc_files
-        #return os.listdir(path)
+        
+        if isinstance(exceptions, list):
+            runbooksrc_files = (f for f in os.listdir(path) if f not in exceptions)
+        else:
+            return os.listdir(path)     
 
     def listdirinfo(self, path):
         """List the content of a directory."""
