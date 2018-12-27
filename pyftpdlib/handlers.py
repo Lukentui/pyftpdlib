@@ -2597,19 +2597,23 @@ class FTPHandler(AsyncChat):
         # the process is started we'll get into troubles (os.getcwd()
         # will fail with ENOENT) but we can't do anything about that
         # except logging an error.
-        init_cwd = getcwdu()
-        try:
-            self.run_as_current_user(self.fs.chdir, path)
-        except (OSError, FilesystemError) as err:
-            why = _strerror(err)
-            self.respond('550 %s.' % why)
+
+        if self.run_as_current_user(self.fs.is_hidden, path):
+            self.respond('550 Невозможно перейти в эту директорию.')
         else:
-            cwd = self.fs.cwd
-            assert isinstance(cwd, unicode), cwd
-            self.respond('250 "%s" is the current directory.' % cwd)
-            if getcwdu() != init_cwd:
-                os.chdir(init_cwd)
-            return path
+            init_cwd = getcwdu()
+            try:
+                self.run_as_current_user(self.fs.chdir, path)
+            except (OSError, FilesystemError) as err:
+                why = _strerror(err)
+                self.respond('550 %s.' % why)
+            else:
+                cwd = self.fs.cwd
+                assert isinstance(cwd, unicode), cwd
+                self.respond('250 "%s" is the current directory.' % cwd)
+                if getcwdu() != init_cwd:
+                    os.chdir(init_cwd)
+                return path
 
     def ftp_CDUP(self, path):
         """Change into the parent directory.
@@ -2735,18 +2739,22 @@ class FTPHandler(AsyncChat):
         On success return the directory path, else None.
         """
         line = self.fs.fs2ftp(path)
-        try:
-            self.run_as_current_user(self.fs.mkdir, path)
-        except (OSError, FilesystemError) as err:
-            why = _strerror(err)
-            self.respond('550 %s.' % why)
+
+        if self.run_as_current_user(self.fs.is_hidden, path):
+            self.respond('550 Создать такую директорию невозможно. Обратитесь в техподдержку.')
         else:
-            # The 257 response is supposed to include the directory
-            # name and in case it contains embedded double-quotes
-            # they must be doubled (see RFC-959, chapter 7, appendix 2).
-            self.respond(
-                '257 "%s" directory created.' % line.replace('"', '""'))
-            return path
+            try:
+                self.run_as_current_user(self.fs.mkdir, path)
+            except (OSError, FilesystemError) as err:
+                why = _strerror(err)
+                self.respond('550 %s.' % why)
+            else:
+                # The 257 response is supposed to include the directory
+                # name and in case it contains embedded double-quotes
+                # they must be doubled (see RFC-959, chapter 7, appendix 2).
+                self.respond(
+                    '257 "%s" directory created.' % line.replace('"', '""'))
+                return path
 
     def ftp_RMD(self, path):
         """Remove the specified directory.
@@ -2791,13 +2799,16 @@ class FTPHandler(AsyncChat):
     def ftp_RNFR(self, path):
         """Rename the specified (only the source name is specified
         here, see RNTO command)"""
-        if not self.fs.lexists(path):
-            self.respond("550 No such file or directory.")
-        elif self.fs.realpath(path) == self.fs.realpath(self.fs.root):
-            self.respond("550 Can't rename home directory.")
+        if self.run_as_current_user(self.fs.is_hidden, src):
+            self.respond("550 Невозможно переименовать этот файл/директорию.")
         else:
-            self._rnfr = path
-            self.respond("350 Ready for destination name.")
+            if not self.fs.lexists(path):
+                self.respond("550 No such file or directory.")
+            elif self.fs.realpath(path) == self.fs.realpath(self.fs.root):
+                self.respond("550 Can't rename home directory.")
+            else:
+                self._rnfr = path
+                self.respond("350 Ready for destination name.")
 
     def ftp_RNTO(self, path):
         """Rename file (destination name only, source is specified with
@@ -2813,7 +2824,7 @@ class FTPHandler(AsyncChat):
         if self.run_as_current_user(self.fs.is_hidden, src):
             self.respond("550 No such file or directory.")
             return
-        
+
         try:
             self.run_as_current_user(self.fs.rename, src, path)
         except (OSError, FilesystemError) as err:

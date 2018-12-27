@@ -264,34 +264,19 @@ class AbstractedFS(object):
 
     def is_hidden(self, path):
         """Is dir/file hidden."""
-        if isinstance(self.exceptions, list):
+        if isinstance(self.exceptions, list): #if exceptions specified 
             find = 0
 
             for excluded_object in self.exceptions:
                 is_file = os.path.isfile(path)
+                exc_path = os.path.join(self.root, excluded_object['name'][1:]) #full path to excluded object
 
-                if excluded_object['is_file'] == is_file:
-                    excl = os.path.join(self.root, excluded_object['name'][1:])
+                if (excluded_object['is_file'] == is_file) and (exc_path == path):
+                    find += 1 #say if found
 
-                    print(type(excl))
-                    print(type(path))
-
-                    print(excl)
-                    print(path)
-
-                    if excl == path:
-                        print('RETURNz!')
-                        find += 1
-
-            print('RETURNB')
-            
-            if find > 0:
-                return True
-            else:
-                return False
-
+            True if (find > 0) else False
         else:
-            return False
+            return False #visible by default
 
     def listdir(self, path):
         """List the content of a directory."""
