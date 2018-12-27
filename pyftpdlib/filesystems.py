@@ -268,22 +268,19 @@ class AbstractedFS(object):
 
             for excluded_object in self.exceptions:
                 is_file = os.path.isfile(path)
-                print(str(os.path.join(self.root, excluded_object['name'][1:])) + ':' + str(path))
-                print(str(excluded_object['is_file']) + ':' + str(is_file))
 
 
 
-                if (excluded_object['is_file'] == is_file) and (str(os.path.join(self.cwd, excluded_object['name'][1:])) == str(path)):
-                    print('RETURNz!')
-                    break
-                    return True
+                if excluded_object['is_file'] == is_file:
+                    print('file TR!')
 
+                    if os.path.join(self.cwd, excluded_object['name'][1:]) == path:
+                        print('RETURNz!')
+                        break
+                        return True
+
+            print('RETURNB')
             return False
-
-            # print(str(find))
-            # print('tr' if find > 0 else 'fas')
-
-            # return True if find > 0 else False
         else:
             return False
 
