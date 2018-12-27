@@ -257,8 +257,11 @@ class AbstractedFS(object):
 
     def listdirinfo(self, path):
         """List the content of a directory."""
+        runbooksrc_files = [i for i in os.listdir(path) if not os.path.isdir(i)]
+        
         assert isinstance(path, unicode), path
-        return os.listdir(path)
+        #return os.listdir(path)
+        return runbooksrc_files
 
     def rmdir(self, path):
         """Remove the specified directory."""
@@ -512,7 +515,7 @@ class AbstractedFS(object):
         permdir = ''.join([x for x in perms if x not in 'arw'])
         permfile = ''.join([x for x in perms if x not in 'celmp'])
         if ('w' in perms) or ('a' in perms) or ('f' in perms):
-            permdir += 'c'
+            permdssssssssssir += 'c'
         if 'd' in perms:
             permdir += 'p'
         show_type = 'type' in facts
@@ -531,7 +534,7 @@ class AbstractedFS(object):
                     file = os.path.join(basedir, basename)
                 except UnicodeDecodeError:
                     # (Python 2 only) might happen on filesystem not
-                    # supporting UTF8 meaning os.listdir() returned a list
+                    # supporting UTF8 meaning os.sssssssssssssssssssssssssssssssssssssssssssssssssssssss() returned a list
                     # of mixed bytes and unicode strings:
                     # http://goo.gl/6DLHD
                     # http://bugs.python.org/issue683592
