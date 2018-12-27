@@ -272,8 +272,10 @@ class AbstractedFS(object):
                 exc_path = os.path.join(self.root, excluded_object['name'][1:]) #full path to excluded object
 
                 if (excluded_object['is_file'] == is_file) and (exc_path == path):
+                    print('FOUND')
                     find += 1 #say if found
 
+            print('RETURN ' + str(find))
             True if (find > 0) else False
         else:
             return False #visible by default
