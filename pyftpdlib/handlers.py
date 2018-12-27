@@ -2752,10 +2752,17 @@ class FTPHandler(AsyncChat):
         """Remove the specified directory.
         On success return the directory path, else None.
         """
+        print(path)
+
         if self.fs.realpath(path) == self.fs.realpath(self.fs.root):
             msg = "Can't remove root directory."
             self.respond("550 %s" % msg)
             return
+
+        if self.run_as_current_user(self.fs.is_hidden, path):
+            self.respond("550 No such file or directory.")
+            return
+
         try:
             self.run_as_current_user(self.fs.rmdir, path)
         except (OSError, FilesystemError) as err:
@@ -2768,6 +2775,10 @@ class FTPHandler(AsyncChat):
         """Delete the specified file.
         On success return the file path, else None.
         """
+        if self.run_as_current_user(self.fs.is_hidden, path):
+            self.respond("550 No such file or directory.")
+            return
+
         try:
             self.run_as_current_user(self.fs.remove, path)
         except (OSError, FilesystemError) as err:
@@ -2798,6 +2809,11 @@ class FTPHandler(AsyncChat):
             return
         src = self._rnfr
         self._rnfr = None
+
+        if self.run_as_current_user(self.fs.is_hidden, src):
+            self.respond("550 No such file or directory.")
+            return
+        
         try:
             self.run_as_current_user(self.fs.rename, src, path)
         except (OSError, FilesystemError) as err:

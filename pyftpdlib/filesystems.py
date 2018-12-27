@@ -307,23 +307,18 @@ class AbstractedFS(object):
     def rmdir(self, path):
         """Remove the specified directory."""
         assert isinstance(path, unicode), path
-        if not self.is_hidden(path):
-            os.rmdir(path)
+        os.rmdir(path)
 
     def remove(self, path):
         """Remove the specified file."""
         assert isinstance(path, unicode), path
-
-        if not self.is_hidden(path):
-            os.remove(path)
+        os.remove(path)
 
     def rename(self, src, dst):
         """Rename the specified src file to the dst filename."""
         assert isinstance(src, unicode), src
         assert isinstance(dst, unicode), dst
-
-        if not self.is_hidden(path):
-            os.rename(src, dst)
+        os.rename(src, dst)
 
     def chmod(self, path, mode):
         """Change file/directory mode."""
