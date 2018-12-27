@@ -265,14 +265,13 @@ class AbstractedFS(object):
     def is_hidden(self, path):
         """Is dir/file hidden."""
         if isinstance(self.exceptions, list):
-            print(self.root)
-            print(self.cwd)
-
-            find = 0
 
             for excluded_object in self.exceptions:
                 is_file = os.path.isfile(path)
                 print(str(os.path.join(self.root, excluded_object['name'][1:])) + ':' + str(path))
+                print(str(excluded_object['is_file']) + ':' + str(is_file))
+
+
 
                 if (excluded_object['is_file'] == is_file) and (os.path.join(self.cwd, excluded_object['name'][1:]) == path):
                     print('RETURNz!')
