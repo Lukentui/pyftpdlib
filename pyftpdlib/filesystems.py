@@ -256,8 +256,8 @@ class AbstractedFS(object):
         """List the content of a directory."""
         assert isinstance(path, unicode), path
         
-        if isinstance(exceptions, list):
-            runbooksrc_files = (f for f in os.listdir(path) if f not in exceptions)
+        if isinstance(self.exceptions, list):
+            return (f for f in os.listdir(path) if f not in self.exceptions)
         else:
             return os.listdir(path)     
 
