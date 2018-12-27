@@ -265,8 +265,16 @@ class AbstractedFS(object):
         """List the content of a directory."""
         assert isinstance(path, unicode), path
         
-        if isinstance(self.exceptions, list):
-            return (f for f in os.listdir(path) if f not in self.exceptions)
+        if isinstance(self.exceptions, dict):
+            files = os.listdir(path)
+
+            for file in files:
+                for excluded_object in exceptions:
+                    is_file = os.path.isfile(os.path.join(path, file))
+                    if (excluded_object['is_file'] == is_file) and (excluded_object['name'] == file):
+                        files.remove(file)
+                        
+            return files
         else:
             return os.listdir(path)     
 
