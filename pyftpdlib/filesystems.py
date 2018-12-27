@@ -272,9 +272,12 @@ class AbstractedFS(object):
 
 
                 if excluded_object['is_file'] == is_file:
-                    print('file TR!')
+                    excl = os.path.join(self.cwd, excluded_object['name'][1:])
 
-                    if os.path.join(self.cwd, excluded_object['name'][1:]) == path:
+                    type(excl)
+                    type(path)
+                    
+                    if excl == path:
                         print('RETURNz!')
                         break
                         return True
