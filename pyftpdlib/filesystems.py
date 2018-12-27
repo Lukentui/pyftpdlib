@@ -276,6 +276,7 @@ class AbstractedFS(object):
                     find += 1 #say if found
 
             print('RETURN ' + str(find))
+            print('Truqe' if (find > 0) else 'Falseq')
             True if (find > 0) else False
         else:
             return False #visible by default
