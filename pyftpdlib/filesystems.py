@@ -1,3 +1,4 @@
+
 # Copyright (C) 2007 Giampaolo Rodola' <g.rodola@gmail.com>.
 # Use of this source code is governed by MIT license that can be
 # found in the LICENSE file.
@@ -54,16 +55,13 @@ class AbstractedFS(object):
     """A class used to interact with the file system, providing a
     cross-platform interface compatible with both Windows and
     UNIX style filesystems where all paths use "/" separator.
-
     AbstractedFS distinguishes between "real" filesystem paths and
     "virtual" ftp paths emulating a UNIX chroot jail where the user
     can not escape its home directory (example: real "/home/user"
     path will be seen as "/" by the client)
-
     It also provides some utility methods and wraps around all os.*
     calls involving operations against the filesystem like creating
     files or removing directories.
-
     FilesystemError exception can be raised from within any of
     the methods below in order to send a customized error string
     to the client.
@@ -82,6 +80,7 @@ class AbstractedFS(object):
         # are responsible to set _cwd attribute as necessary.
         self._cwd = u('/')
         self._root = root
+        self._exceptions = []
         self.cmd_channel = cmd_channel
 
     @property
@@ -94,6 +93,16 @@ class AbstractedFS(object):
         """The user current working directory."""
         return self._cwd
 
+    @property
+    def exceptions(self):
+        """The user current working directory."""
+        return self._exceptions
+    
+    @exceptions.setter
+    def exceptions(self, list_files):
+        assert isinstance(list_files, list), list_files
+        self._exceptions = list_files
+    
     @root.setter
     def root(self, path):
         assert isinstance(path, unicode), path
@@ -109,11 +118,9 @@ class AbstractedFS(object):
     def ftpnorm(self, ftppath):
         """Normalize a "virtual" ftp pathname (typically the raw string
         coming from client) depending on the current working directory.
-
         Example (having "/foo" as current working directory):
         >>> ftpnorm('bar')
         '/foo/bar'
-
         Note: directory separators are system independent ("/").
         Pathname returned is always absolutized.
         """
@@ -142,11 +149,9 @@ class AbstractedFS(object):
         """Translate a "virtual" ftp pathname (typically the raw string
         coming from client) into equivalent absolute "real" filesystem
         pathname.
-
         Example (having "/home/user" as root directory):
         >>> ftp2fs("foo")
         '/home/user/foo'
-
         Note: directory separators are system dependent.
         """
         assert isinstance(ftppath, unicode), ftppath
@@ -161,14 +166,11 @@ class AbstractedFS(object):
         """Translate a "real" filesystem pathname into equivalent
         absolute "virtual" ftp pathname depending on the user's
         root directory.
-
         Example (having "/home/user" as root directory):
         >>> fs2ftp("/home/user/foo")
         '/foo'
-
         As for ftpnorm, directory separators are system independent
         ("/") and pathname returned is always absolutized.
-
         On invalid pathnames escaping from user's root directory
         (e.g. "/home" when root is "/home/user") always return "/".
         """
@@ -188,10 +190,8 @@ class AbstractedFS(object):
     def validpath(self, path):
         """Check whether the path belongs to user's home directory.
         Expected argument is a "real" filesystem pathname.
-
         If path is a symbolic link it is resolved to check its real
         destination.
-
         Pathnames escaping from user's root directory are considered
         not valid.
         """
@@ -253,12 +253,24 @@ class AbstractedFS(object):
     def listdir(self, path):
         """List the content of a directory."""
         assert isinstance(path, unicode), path
-        return os.listdir(path)
+        
+        if isinstance(self.exceptions, list):
+            files = os.listdir(path)
+
+            for file in files:
+                for excluded_object in self.exceptions:
+                    is_file = os.path.isfile(os.path.join(path, file))
+                    if (excluded_object['is_file'] == is_file) and (excluded_object['name'] == file):
+                        files.remove(file)
+                        
+            return files
+        else:
+            return os.listdir(path)     
 
     def listdirinfo(self, path):
         """List the content of a directory."""
         assert isinstance(path, unicode), path
-        return os.listdir(path)
+        return self.listdir(path)
 
     def rmdir(self, path):
         """Remove the specified directory."""
@@ -388,20 +400,16 @@ class AbstractedFS(object):
     def format_list(self, basedir, listing, ignore_err=True):
         """Return an iterator object that yields the entries of given
         directory emulating the "/bin/ls -lA" UNIX command output.
-
          - (str) basedir: the absolute dirname.
          - (list) listing: the names of the entries in basedir
          - (bool) ignore_err: when False raise exception if os.lstat()
          call fails.
-
         On platforms which do not support the pwd and grp modules (such
         as Windows), ownership is printed as "owner" and "group" as a
         default, and number of hard links is always "1". On UNIX
         systems, the actual owner, group, and number of links are
         printed.
-
         This is how output appears to client:
-
         -rw-rw-rw-   1 owner   group    7045120 Sep 02  3:47 music.mp3
         drwxrwxrwx   1 owner   group          0 Aug 31 18:50 e-books
         -rw-rw-rw-   1 owner   group        380 Sep 02  3:40 module.py
@@ -482,24 +490,19 @@ class AbstractedFS(object):
         """Return an iterator object that yields the entries of a given
         directory or of a single file in a form suitable with MLSD and
         MLST commands.
-
         Every entry includes a list of "facts" referring the listed
         element.  See RFC-3659, chapter 7, to see what every single
         fact stands for.
-
          - (str) basedir: the absolute dirname.
          - (list) listing: the names of the entries in basedir
          - (str) perms: the string referencing the user permissions.
          - (str) facts: the list of "facts" to be returned.
          - (bool) ignore_err: when False raise exception if os.stat()
          call fails.
-
         Note that "facts" returned may change depending on the platform
         and on what user specified by using the OPTS command.
-
         This is how output could appear to the client issuing
         a MLSD request:
-
         type=file;size=156;perm=r;modify=20071029155301;unique=8012; music.mp3
         type=dir;size=0;perm=el;modify=20071127230206;unique=801e33; ebooks
         type=file;size=211;perm=r;modify=20071103093626;unique=192; module.py
@@ -531,7 +534,7 @@ class AbstractedFS(object):
                     file = os.path.join(basedir, basename)
                 except UnicodeDecodeError:
                     # (Python 2 only) might happen on filesystem not
-                    # supporting UTF8 meaning os.listdir() returned a list
+                    # supporting UTF8 meaning os.sssssssssssssssssssssssssssssssssssssssssssssssssssssss() returned a list
                     # of mixed bytes and unicode strings:
                     # http://goo.gl/6DLHD
                     # http://bugs.python.org/issue683592
@@ -620,7 +623,6 @@ if os.name == 'posix':
 
     class UnixFilesystem(AbstractedFS):
         """Represents the real UNIX filesystem.
-
         Differently from AbstractedFS the client will login into
         /home/<username> and will be able to escape its home directory
         and navigate the real filesystem.
