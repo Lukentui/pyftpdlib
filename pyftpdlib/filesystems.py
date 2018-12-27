@@ -268,6 +268,8 @@ class AbstractedFS(object):
             for excluded_object in self.exceptions:
                 is_file = os.path.isfile(path)
 
+                print(os.path.join(self.cwd, excluded_object['name']))
+
                 if (excluded_object['is_file'] == is_file) and (excluded_object['name']  == path):
                     return True #if file listed - return true
 
