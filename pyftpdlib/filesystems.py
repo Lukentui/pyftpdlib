@@ -274,7 +274,7 @@ class AbstractedFS(object):
                 if excluded_object['is_file'] == is_file:
                     excl = os.path.join(self.cwd, excluded_object['name'][1:])
 
-                    print(self.cwd)
+                    print(self.root)
                     print(excluded_object['name'][1:])
 
                     print(type(excl))
