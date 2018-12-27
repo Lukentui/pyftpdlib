@@ -278,6 +278,8 @@ class AbstractedFS(object):
                 if (excluded_object['is_file'] == is_file) and (os.path.join(self.cwd, excluded_object['name'][1:]) == path):
                     find += 1 #if file listed - return true
 
+            print('tr' if find > 0 else 'fas')
+
             return True if find > 0 else False
         else:
             return False
