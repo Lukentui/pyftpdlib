@@ -515,7 +515,7 @@ class AbstractedFS(object):
         permdir = ''.join([x for x in perms if x not in 'arw'])
         permfile = ''.join([x for x in perms if x not in 'celmp'])
         if ('w' in perms) or ('a' in perms) or ('f' in perms):
-            permdssssssssssir += 'c'
+            permdir += 'c'
         if 'd' in perms:
             permdir += 'p'
         show_type = 'type' in facts
