@@ -271,11 +271,8 @@ class AbstractedFS(object):
 
     def listdirinfo(self, path):
         """List the content of a directory."""
-        runbooksrc_files = [i for i in os.listdir(path) if not os.path.isdir(i)]
-        
         assert isinstance(path, unicode), path
-        #return os.listdir(path)
-        return runbooksrc_files
+        return self.listdir(path)
 
     def rmdir(self, path):
         """Remove the specified directory."""
