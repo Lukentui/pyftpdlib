@@ -278,8 +278,6 @@ class AbstractedFS(object):
     def listdir(self, path):
         """List the content of a directory."""
         assert isinstance(path, unicode), path
-
-
         
         if isinstance(self.exceptions, list):
             files = os.listdir(path)
@@ -302,7 +300,7 @@ class AbstractedFS(object):
     def rmdir(self, path):
         """Remove the specified directory."""
         assert isinstance(path, unicode), path
-
+        print(path)
         if not self.is_hidden(path):
             os.rmdir(path)
 
