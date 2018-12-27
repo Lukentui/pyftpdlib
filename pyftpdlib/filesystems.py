@@ -273,12 +273,12 @@ class AbstractedFS(object):
 
                 print(str(os.path.join(self.root, excluded_object['name'][1:])) + ':' + str(path))
 
-                # print(os.path.join(self.cwd, excluded_object['name']))
+                find = 0
 
                 if (excluded_object['is_file'] == is_file) and (os.path.join(self.cwd, excluded_object['name'][1:]) == path):
-                    return True #if file listed - return true
+                    find++ #if file listed - return true
 
-            return False
+            return True if find > 0 else False
         else:
             return False
 
